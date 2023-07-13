@@ -1,5 +1,6 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import { StyleSheet, Alert, View, Pressable, Image, Modal, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {  ControlPresupuesto, FormularioGasto, Header, ListadoGastos, NuevoPresupuesto, FiltroGastos } from './src/components';
 import { generateID } from './src/helpers';
 
@@ -11,6 +12,59 @@ export default function Main() {
   const [gasto,setGasto] = useState({} as Gasto)
   const [filter, setFilter] = useState('')
   const [filterGastos, setFilterGastos] = useState ([] as Gasto[])
+
+  useEffect(()=>{
+      const obtenerPresupuesto=async()=>{
+          try{
+              const presupuestoStorage=await AsyncStorage.getItem('planificador-presupuesto') ?? 0
+              if(presupuestoStorage !== 0){
+                  setPresupuesto(Number(presupuesto))
+                  setIsValidPresupesto(true)
+              }
+          }catch(error){
+              console.error(error)
+          }
+      }
+      obtenerPresupuesto()
+  },[])
+
+  useEffect(()=>{
+      if(isValidPresupuesto){
+        const cargarPresupuesto=async()=>{
+          try{
+            await AsyncStorage.setItem('planificador-presupuesto',JSON.stringify(presupuesto))
+          }catch(error){
+              console.error(error)
+          }
+      }
+
+      cargarPresupuesto()}
+  },[isValidPresupuesto])
+
+  useEffect(()=>{
+    const obtenerGastos=async()=>{
+        try{
+            const gastosStorage=await AsyncStorage.getItem('planificador-gastos')
+                setGastos(gastosStorage ? JSON.parse(gastosStorage) : [])
+        }catch(error){
+            console.error(error)
+        }
+    }
+
+    obtenerGastos()
+},[])
+
+useEffect(()=>{
+    const cargarGastos=async()=>{
+        try{
+          await AsyncStorage.setItem('planificador-gastos',JSON.stringify(gastos))
+        }catch(error){
+            console.error(error)
+        }
+    }
+
+    cargarGastos()
+},[gastos])
 
   const handlePresupesto=(presupuesto:number)=>{
       if(presupuesto > 0){

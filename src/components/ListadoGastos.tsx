@@ -20,7 +20,7 @@ export function ListadoGastos(props:Props) {
                     : gastos.map(gasto=>(<Gasto key={gasto.id} gasto={gasto} setGasto={setGasto} setModal={setModal}/>))
             }
 
-            {gastos.length===0 || (filterGastos.length === 0 && !!filter )
+            {(gastos.length===0 || (filterGastos.length === 0 && !!filter ))
             && (<Text style={styles.noGastos}>No hay gastos</Text>)}
     </View>
   )
